@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -57,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -121,6 +124,7 @@ private fun BambuStudioMobileApp() {
     var selectedPrinter by remember { mutableStateOf(printers.first()) }
     var selectedTab by remember { mutableStateOf(StudioTab.Monitor) }
     var lastAction by remember { mutableStateOf("Backend not connected") }
+    var showAbout by remember { mutableStateOf(false) }
     val gateway = remember { MockCommandGateway }
 
     MaterialTheme(
@@ -135,7 +139,7 @@ private fun BambuStudioMobileApp() {
     ) {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(Modifier.fillMaxSize()) {
-                TopBar(lastAction)
+                TopBar(lastAction, onAbout = { showAbout = true })
                 PrinterStrip(
                     printers = printers,
                     selected = selectedPrinter,
@@ -158,13 +162,16 @@ private fun BambuStudioMobileApp() {
                         StudioTab.Settings -> SettingsScreen()
                     }
                 }
+                if (showAbout) {
+                    AboutDialog(onDismiss = { showAbout = false })
+                }
             }
         }
     }
 }
 
 @Composable
-private fun TopBar(lastAction: String) {
+private fun TopBar(lastAction: String, onAbout: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -195,7 +202,42 @@ private fun TopBar(lastAction: String) {
         IconButton(onClick = {}) {
             Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color.White)
         }
+        TextButton(onClick = onAbout) {
+            Text("About", color = Color.White)
+        }
     }
+}
+
+@Composable
+private fun AboutDialog(onDismiss: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("About Bambu Studio Mobile") },
+        text = {
+            Column {
+                Text("Developer: Andrei Efremushkin")
+                Text(
+                    "Email: andrei.efr@gmail.com",
+                    modifier = Modifier.clickable {
+                        uriHandler.openUri("mailto:andrei.efr@gmail.com")
+                    }
+                )
+                Text(
+                    "GitHub: https://github.com/efremandrei/BambUStudioMobile",
+                    modifier = Modifier.clickable {
+                        uriHandler.openUri("https://github.com/efremandrei/BambUStudioMobile")
+                    }
+                )
+                Text("Version: ${BuildConfig.VERSION_NAME}/${BuildConfig.VERSION_CODE}")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
 }
 
 @Composable
