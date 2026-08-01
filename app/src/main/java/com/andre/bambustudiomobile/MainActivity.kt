@@ -1,5 +1,6 @@
 package com.andre.bambustudiomobile
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -59,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +70,7 @@ import androidx.compose.ui.unit.sp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppUpdateChecker.checkDaily(this)
         setContent {
             BambuStudioMobileApp()
         }
@@ -210,6 +213,8 @@ private fun TopBar(lastAction: String, onAbout: () -> Unit) {
 
 @Composable
 private fun AboutDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val activity = context as? Activity
     val uriHandler = LocalUriHandler.current
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -235,6 +240,11 @@ private fun AboutDialog(onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("Close")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { activity?.let(AppUpdateChecker::checkNow) }) {
+                Text("Check for updates")
             }
         }
     )
