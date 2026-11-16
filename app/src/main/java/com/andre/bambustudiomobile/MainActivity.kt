@@ -224,12 +224,16 @@ private fun AboutDialog(onDismiss: () -> Unit) {
                 Text("Developer: Andrei Efremushkin")
                 Text(
                     "Email: andrei.efr@gmail.com",
+                    color = MaterialTheme.colorScheme.primary,
+                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
                     modifier = Modifier.clickable {
                         uriHandler.openUri("mailto:andrei.efr@gmail.com")
                     }
                 )
                 Text(
                     "GitHub: https://github.com/efremandrei/BambUStudioMobile",
+                    color = MaterialTheme.colorScheme.primary,
+                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
                     modifier = Modifier.clickable {
                         uriHandler.openUri("https://github.com/efremandrei/BambUStudioMobile")
                     }
